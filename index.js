@@ -128,15 +128,15 @@ client.on('ready', async () => {
     .setDescription(`
 Redeem your **Invoice ID** to instantly receive the Client Role. Unlock access to exclusive giveaways, private chat channels, and other premium features – fast, secure, and hassle-free.
 
-<:diamond_yellow:1381704004991586405> **Premium Client Benefits**
-<:YellowDot:1381703990781415424> **Exclusive Giveaways**- Entry to high-value prize events  
-<:YellowDot:1381703990781415424> **Private Chat Access**- Join members-only discussions  
-<:YellowDot:1381703990781415424> **More Features**- Enjoy ongoing client-only upgrades
+<:diamond_yellow:1381704004991586405> __**Premium Client Benefits**__
+<:YellowDot:1381703990781415424> **Exclusive Giveaways** - Entry to high-value prize events  
+<:YellowDot:1381703990781415424> **Private Chat Access** - Join members-only discussions  
+<:YellowDot:1381703990781415424> **More Features** - Enjoy ongoing client-only upgrades
 
-<:diamond_yellow:1381704004991586405> **Quick & Secure Redemption**
-<:YellowDot:1381703990781415424> **Instant Assignment**- Applied right after validation  
-<:YellowDot:1381703990781415424> **Simple Process**- Just enter your Invoice ID  
-<:YellowDot:1381703990781415424> **Trusted System**- Secure and reliable role delivery
+<:diamond_yellow:1381704004991586405> __**Quick & Secure Redemption**__
+<:YellowDot:1381703990781415424> **Instant Assignment** - Applied right after validation  
+<:YellowDot:1381703990781415424> **Simple Process** - Just enter your Invoice ID  
+<:YellowDot:1381703990781415424> **Trusted System** - Secure and reliable role delivery
 `)
     .setColor('#FFFF00')
     .setImage('https://media.discordapp.net/attachments/1376632471260762112/1376632582149640212/G23FX56.gif?ex=684fbdc0&is=684e6c40&hm=035406d63e33600ac39ef807d29ab0a6ace81e63acb0c6394fa88fd396a72a17&=')
