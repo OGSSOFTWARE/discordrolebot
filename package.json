@@ -10,8 +10,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "discord.js": "^14.19.3",
-    "dotenv": "^16.5.0",
-    "undici": "^7.10.0"
+    "pg": "^8.16.2"
   }
 }
