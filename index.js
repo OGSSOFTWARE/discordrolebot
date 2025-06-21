@@ -108,6 +108,7 @@ client.on('interactionCreate', async interaction => {
         ephemeral: true
       });
 
+      // Logging to log channel
       const logChannel = await client.channels.fetch(process.env.REDEEM_LOG_CHANNEL_ID).catch(console.error);
       if (logChannel && logChannel.isTextBased()) {
         const logEmbed = new EmbedBuilder()
@@ -134,16 +135,21 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-
+// Embed & button message sent when bot becomes ready
 client.on('ready', async () => {
-  const guild = await client.guilds.fetch(process.env.GUILD_ID);
-  const channel = guild.channels.cache.get(process.env.REDEEM_CHANNEL_ID);
-  if (!channel) return console.log('❌ Redeem channel not found.');
+  try {
+    console.log('🟢 Ready event triggered.');
+    const guild = await client.guilds.fetch(process.env.GUILD_ID);
+    const channel = await guild.channels.fetch(process.env.REDEEM_CHANNEL_ID).catch(() => null);
 
-  const embed = new EmbedBuilder()
-    .setTitle('Get Premium Access - Reedem Youre Purchase')
-    .setURL('https://ogsware.com/')
-    .setDescription(`
+    if (!channel || !channel.isTextBased()) {
+      return console.log('❌ Redeem channel not found or not text-based.');
+    }
+
+    const embed = new EmbedBuilder()
+      .setTitle('Get Premium Access - Reedem Youre Purchase')
+      .setURL('https://ogsware.com/')
+      .setDescription(`
 Redeem your **Invoice ID** to instantly receive the Client Role. Unlock access to exclusive giveaways, private chat channels, and other premium features – fast, secure, and hassle-free.
 
 <:diamond_yellow:1381704004991586405> **Premium Client Benefits**
@@ -156,21 +162,27 @@ Redeem your **Invoice ID** to instantly receive the Client Role. Unlock access t
 <:YellowDot:1381703990781415424> **Simple Process** - Just enter your Invoice ID  
 <:YellowDot:1381703990781415424> **Trusted System** - Secure and reliable role delivery
 `)
-    .setColor('#FFFF00')
-    .setImage('https://media.discordapp.net/attachments/1376632471260762112/1376632582149640212/G23FX56.gif?ex=684fbdc0&is=684e6c40&hm=035406d63e33600ac39ef807d29ab0a6ace81e63acb0c6394fa88fd396a72a17&=')
-    .setFooter({
-      text: 'OGSWare | © 2025 Copyright. All Rights Reserved.',
-      iconURL: 'https://media.discordapp.net/attachments/1376632471260762112/1376632582590173315/IMG_3328.gif?ex=684fbdc0&is=684e6c40&hm=6aa0cbf9e2bd899970c2367c674550803be49ccd096b0f6e02964a428cc31f2b&=&width=864&height=864'
-    });
+      .setColor('#FFFF00')
+      .setImage('https://media.discordapp.net/attachments/1376632471260762112/1376632582149640212/G23FX56.gif')
+      .setFooter({
+        text: 'OGSWare | © 2025 Copyright. All Rights Reserved.',
+        iconURL: 'https://media.discordapp.net/attachments/1376632471260762112/1376632582590173315/IMG_3328.gif'
+      });
 
-  const button = new ButtonBuilder()
-    .setCustomId('redeem_button')
-    .setLabel('Redeem Invoice ID')
-    .setStyle(ButtonStyle.Secondary);
+    const button = new ButtonBuilder()
+      .setCustomId('redeem_button')
+      .setLabel('Redeem Invoice ID')
+      .setStyle(ButtonStyle.Secondary);
 
-  const row = new ActionRowBuilder().addComponents(button);
-  await channel.send({ embeds: [embed], components: [row] });
-  console.log('Redeem message sent.');
+    const row = new ActionRowBuilder().addComponents(button);
+
+    await channel.send({ embeds: [embed], components: [row] });
+    console.log('✅ Redeem embed sent.');
+
+  } catch (err) {
+    console.error('❌ Error in ready event:', err);
+  }
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
