@@ -1,6 +1,5 @@
 require('dotenv').config();
-const fs = require('fs');
-const path = require('path');
+const { Pool } = require('pg');
 const {
   Client,
   GatewayIntentBits,
@@ -15,7 +14,7 @@ const {
 } = require('discord.js');
 const { fetch } = require('undici');
 
-const USED_INVOICES_PATH = path.join(__dirname, 'used_invoices.json');
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages],
@@ -26,15 +25,14 @@ client.once('ready', () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
 });
 
-function getUsedInvoices() {
-  if (!fs.existsSync(USED_INVOICES_PATH)) return [];
-  return JSON.parse(fs.readFileSync(USED_INVOICES_PATH));
+// Database helpers
+async function isInvoiceUsed(invoiceId) {
+  const res = await pool.query('SELECT 1 FROM used_invoices WHERE invoice_id = $1', [invoiceId]);
+  return res.rowCount > 0;
 }
 
-function saveUsedInvoice(id) {
-  const used = getUsedInvoices();
-  used.push(id);
-  fs.writeFileSync(USED_INVOICES_PATH, JSON.stringify(used, null, 2));
+async function saveUsedInvoice(invoiceId) {
+  await pool.query('INSERT INTO used_invoices (invoice_id) VALUES ($1)', [invoiceId]);
 }
 
 client.on('interactionCreate', async interaction => {
@@ -56,11 +54,10 @@ client.on('interactionCreate', async interaction => {
   }
 
   if (interaction.isModalSubmit() && interaction.customId === 'redeem_modal') {
-    const invoiceId = interaction.fields.getTextInputValue('invoice_id');
+    const invoiceId = interaction.fields.getTextInputValue('invoice_id').trim();
     console.log(`🔍 User entered invoice ID: ${invoiceId}`);
 
-    const used = getUsedInvoices();
-    if (used.includes(invoiceId)) {
+    if (await isInvoiceUsed(invoiceId)) {
       return await interaction.reply({
         content: '⚠️ This invoice has already been redeemed.',
         ephemeral: true
@@ -85,7 +82,7 @@ client.on('interactionCreate', async interaction => {
       }
 
       const data = JSON.parse(raw);
-      const invoice = data.data.find(inv => inv.unique_id === invoiceId.trim());
+      const invoice = data.data.find(inv => inv.unique_id === invoiceId);
 
       if (!invoice) {
         return await interaction.reply({ content: '❌ Invoice not found.', ephemeral: true });
@@ -101,14 +98,13 @@ client.on('interactionCreate', async interaction => {
       }
 
       await interaction.member.roles.add(role);
-      saveUsedInvoice(invoiceId);
+      await saveUsedInvoice(invoiceId);
 
       await interaction.reply({
         content: '✅ Invoice verified. You have been given the Client role!',
         ephemeral: true
       });
 
-      // Logging to log channel
       const logChannel = await client.channels.fetch(process.env.REDEEM_LOG_CHANNEL_ID).catch(console.error);
       if (logChannel && logChannel.isTextBased()) {
         const logEmbed = new EmbedBuilder()
@@ -135,7 +131,6 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-// Embed & button message sent when bot becomes ready
 client.on('ready', async () => {
   try {
     console.log('🟢 Ready event triggered.');
@@ -147,7 +142,7 @@ client.on('ready', async () => {
     }
 
     const embed = new EmbedBuilder()
-      .setTitle('Get Premium Access - Reedem Youre Purchase')
+      .setTitle('Get Premium Access - Redeem Your Purchase')
       .setURL('https://ogsware.com/')
       .setDescription(`
 Redeem your **Invoice ID** to instantly receive the Client Role. Unlock access to exclusive giveaways, private chat channels, and other premium features – fast, secure, and hassle-free.
@@ -185,4 +180,3 @@ Redeem your **Invoice ID** to instantly receive the Client Role. Unlock access t
 });
 
 client.login(process.env.DISCORD_TOKEN);
-
