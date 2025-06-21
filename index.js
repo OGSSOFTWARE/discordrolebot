@@ -30,7 +30,7 @@ client.once('ready', async () => {
 
     // Set bot status
     client.user.setPresence({
-      activities: [{ name: 'ogsware.com', type: 3 }], // Watching ogsware.com
+      activities: [{ name: '⭐ ogsware.com', type: 3 }], // Watching ogsware.com
       status: 'online'
     });
 
@@ -66,7 +66,7 @@ Redeem your **Invoice ID** to instantly receive the Client Role. Unlock access t
 
     const button = new ButtonBuilder()
       .setCustomId('redeem_button')
-      .setLabel('Redeem Invoice ID')
+      .setLabel('📮 Redeem Invoice ID')
       .setStyle(ButtonStyle.Secondary);
 
     const row = new ActionRowBuilder().addComponents(button);
