@@ -107,6 +107,23 @@ client.on('interactionCreate', async interaction => {
         content: '✅ Invoice verified. You have been given the Client role!',
         ephemeral: true
       });
+
+      const logChannel = await client.channels.fetch(process.env.REDEEM_LOG_CHANNEL_ID).catch(console.error);
+      if (logChannel && logChannel.isTextBased()) {
+        const logEmbed = new EmbedBuilder()
+          .setTitle('📥 Invoice Redeemed')
+          .addFields(
+            { name: 'User', value: `${interaction.user.tag} (${interaction.user.id})`, inline: true },
+            { name: 'Invoice ID', value: invoiceId, inline: true },
+            { name: 'Status', value: invoice.status, inline: true }
+          )
+          .setColor('#00FF00')
+          .setTimestamp()
+          .setFooter({ text: 'OGSWare | Invoice Log' });
+
+        logChannel.send({ embeds: [logEmbed] }).catch(console.error);
+      }
+
     } catch (err) {
       console.error('❌ Error verifying invoice:', err);
       await interaction.reply({
@@ -116,6 +133,7 @@ client.on('interactionCreate', async interaction => {
     }
   }
 });
+
 
 client.on('ready', async () => {
   const guild = await client.guilds.fetch(process.env.GUILD_ID);
@@ -128,12 +146,12 @@ client.on('ready', async () => {
     .setDescription(`
 Redeem your **Invoice ID** to instantly receive the Client Role. Unlock access to exclusive giveaways, private chat channels, and other premium features – fast, secure, and hassle-free.
 
-<:diamond_yellow:1381704004991586405> __**Premium Client Benefits**__
+<:diamond_yellow:1381704004991586405> **Premium Client Benefits**
 <:YellowDot:1381703990781415424> **Exclusive Giveaways** - Entry to high-value prize events  
 <:YellowDot:1381703990781415424> **Private Chat Access** - Join members-only discussions  
 <:YellowDot:1381703990781415424> **More Features** - Enjoy ongoing client-only upgrades
 
-<:diamond_yellow:1381704004991586405> __**Quick & Secure Redemption**__
+<:diamond_yellow:1381704004991586405> **Quick & Secure Redemption**
 <:YellowDot:1381703990781415424> **Instant Assignment** - Applied right after validation  
 <:YellowDot:1381703990781415424> **Simple Process** - Just enter your Invoice ID  
 <:YellowDot:1381703990781415424> **Trusted System** - Secure and reliable role delivery
